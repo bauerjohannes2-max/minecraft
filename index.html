@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoxelCraft</title>
+<link rel="stylesheet" href="css/style.css">
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+
+<!-- ===== RENDER CANVAS ===== -->
+<canvas id="game-canvas"></canvas>
+
+<!-- ===== DAMAGE FLASH OVERLAY ===== -->
+<div id="damage-flash"></div>
+
+<!-- ===== TITLE SCREEN ===== -->
+<div id="title-screen" class="screen">
+  <h1 class="title">VOXEL<span>CRAFT</span></h1>
+  <p class="subtitle">A Minecraft-like survival sandbox</p>
+  <div class="menu-buttons">
+    <button id="btn-continue" class="hidden">▶ Continue World</button>
+    <div id="continue-info" class="hint" style="position:static;margin-top:-6px;margin-bottom:6px"></div>
+    <button id="btn-new-world">🌿 New World</button>
+  </div>
+  <p class="hint">v0.1 · built in a chat with an AI</p>
+</div>
+
+<!-- ===== LOADING SCREEN ===== -->
+<div id="loading-screen" class="screen hidden">
+  <h2>Generating World…</h2>
+  <div id="loading-bar-outer">
+    <div id="loading-bar"></div>
+  </div>
+  <p id="loading-status">Reticulating splines…</p>
+</div>
+
+<!-- ===== PAUSE MENU ===== -->
+<div id="pause-screen" class="screen hidden">
+  <h2>Game Paused</h2>
+  <div class="menu-buttons">
+    <button id="btn-resume">▶ Resume</button>
+    <button id="btn-save">💾 Save Game</button>
+    <button id="btn-quit">✖ Quit to Title</button>
+  </div>
+</div>
+
+<!-- ===== IN-GAME UI LAYER ===== -->
+<div id="ui-layer" class="hidden">
+
+  <!-- time clock -->
+  <div id="clock">☀️ 12:00</div>
+
+  <!-- crosshair -->
+  <div id="crosshair"></div>
+
+  <!-- top-left debug -->
+  <div id="debug-overlay" class="hidden"></div>
+
+  <!-- hearts + hunger -->
+  <div id="hud-status">
+    <div id="hearts"></div>
+    <div id="hunger"></div>
+  </div>
+
+  <!-- hotbar -->
+  <div id="hotbar"></div>
+
+  <!-- crafting table 3x3 modal -->
+  <div id="table-panel" class="hidden">
+    <div class="panel-title">⚒️ Crafting Table</div>
+  </div>
+
+  <!-- furnace modal -->
+  <div id="furnace-panel" class="hidden">
+    <div class="panel-title">🔥 Furnace</div>
+    <div class="furn-row">
+      <div class="furn-col">
+        <div id="furn-input" class="slot"></div>
+        <div class="flame-wrap"><div id="furn-flame"></div></div>
+        <div id="furn-fuel" class="slot"></div>
+      </div>
+      <div class="prog-wrap"><div id="furn-progress"></div></div>
+      <div id="furn-output" class="slot"></div>
+    </div>
+  </div>
+
+  <!-- inventory panel (toggled with E) -->
+  <div id="inventory-panel" class="hidden">
+    <h3>Inventory</h3>
+    <div id="crafting-area" style="display:none">
+      <div id="crafting-grid"></div>
+      <div id="craft-arrow">➜</div>
+      <div id="craft-result"></div>
+    </div>
+    <div id="inventory-grid"></div>
+  </div>
+
+  <!-- death screen modal -->
+  <div id="death-screen" class="hidden">
+    <div class="death-box">
+      <h1>☠️ You Died!</h1>
+      <p id="death-cause">The world claims another builder…</p>
+      <button id="btn-respawn">Revive at Spawn</button>
+    </div>
+  </div>
+
+  <!-- item pickup toast -->
+  <div id="toast"></div>
+</div>
+
+<!-- ===== BOOT ===== -->
+<script type="module">
+import { boot } from './js/main.js';
+boot();
+</script>
+
+</body>
+</html>
