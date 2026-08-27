@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>VoxelCraft</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛏️</text></svg>">
 <link rel="stylesheet" href="css/style.css">
@@ -56,6 +56,34 @@
 
 <!-- ===== IN-GAME UI LAYER ===== -->
 <div id="ui-layer" class="hidden">
+
+  <!-- mobile touch controls (visible on touch devices) -->
+  <div id="touch-controls" class="hidden">
+    <!-- virtual joystick / D-pad on left -->
+    <div id="touch-dpad">
+      <div class="touch-btn dpad-btn" id="dpad-up">▲</div>
+      <div class="dpad-mid">
+        <div class="touch-btn dpad-btn" id="dpad-left">◀</div>
+        <div class="touch-btn dpad-btn" id="dpad-center">●</div>
+        <div class="touch-btn dpad-btn" id="dpad-right">▶</div>
+      </div>
+      <div class="touch-btn dpad-btn" id="dpad-down">▼</div>
+    </div>
+
+    <!-- right action buttons -->
+    <div id="touch-actions">
+      <div class="touch-btn" id="btn-touch-jump">🦘</div>
+      <div class="touch-btn" id="btn-touch-place">🧱 Place</div>
+      <div class="touch-btn" id="btn-touch-attack">⛏️ Break</div>
+    </div>
+
+    <!-- top quick buttons -->
+    <div id="touch-top-bar">
+      <div class="touch-btn" id="btn-touch-pause">⏸️</div>
+      <div class="touch-btn" id="btn-touch-inv">🎒 Bag</div>
+      <div class="touch-btn" id="btn-touch-fly">✈️ Fly</div>
+    </div>
+  </div>
 
   <!-- time clock -->
   <div id="clock">☀️ 12:00</div>

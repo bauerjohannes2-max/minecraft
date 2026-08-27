@@ -111,6 +111,138 @@ export class Controls {
     document.addEventListener('click', () => {
       if (!this.locked && !this.uiOpen && this.wantLock) this.requestLock();
     });
+
+    // ---------------- mobile touch detection & setup ----------------
+    this.isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.matchMedia('(pointer: coarse)').matches;
+    if (this.isTouch) {
+      this._initTouchControls();
+    }
+  }
+
+  _initTouchControls() {
+    const tc = document.getElementById('touch-controls');
+    if (tc) tc.classList.remove('hidden');
+    this.locked = true;
+
+    // Right-side swipe look
+    let lookTouchId = null;
+    let lastLookX = 0, lastLookY = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      if (this.uiOpen) return;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const t = e.changedTouches[i];
+        if (t.clientX > window.innerWidth * 0.30 && lookTouchId === null) {
+          const target = document.elementFromPoint(t.clientX, t.clientY);
+          if (target && target.closest('.touch-btn, .slot')) continue;
+          lookTouchId = t.identifier;
+          lastLookX = t.clientX;
+          lastLookY = t.clientY;
+        }
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (this.uiOpen) return;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const t = e.changedTouches[i];
+        if (t.identifier === lookTouchId) {
+          const dx = t.clientX - lastLookX;
+          const dy = t.clientY - lastLookY;
+          this._mouseDX += dx * 1.5;
+          this._mouseDY += dy * 1.5;
+          lastLookX = t.clientX;
+          lastLookY = t.clientY;
+        }
+      }
+    }, { passive: true });
+
+    const endLook = (e) => {
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === lookTouchId) {
+          lookTouchId = null;
+        }
+      }
+    };
+    window.addEventListener('touchend', endLook, { passive: true });
+    window.addEventListener('touchcancel', endLook, { passive: true });
+
+    // D-Pad buttons
+    const bindBtn = (id, onDown, onUp) => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        btn.classList.add('active');
+        onDown();
+      }, { passive: false });
+      btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        btn.classList.remove('active');
+        onUp();
+      }, { passive: false });
+      btn.addEventListener('touchcancel', () => {
+        btn.classList.remove('active');
+        onUp();
+      }, { passive: true });
+    };
+
+    bindBtn('dpad-up', () => {
+      const now = performance.now();
+      if (now - this._lastWPressTime < 350) this._doubleTapSprint = true;
+      this._lastWPressTime = now;
+      this.keys.add('KeyW');
+    }, () => {
+      this.keys.delete('KeyW');
+      this._doubleTapSprint = false;
+    });
+    bindBtn('dpad-down', () => this.keys.add('KeyS'), () => this.keys.delete('KeyS'));
+    bindBtn('dpad-left', () => this.keys.add('KeyA'), () => this.keys.delete('KeyA'));
+    bindBtn('dpad-right', () => this.keys.add('KeyD'), () => this.keys.delete('KeyD'));
+    bindBtn('dpad-center', () => {
+      if (this.keys.has('ShiftLeft')) this.keys.delete('ShiftLeft');
+      else this.keys.add('ShiftLeft');
+    }, () => {});
+
+    // Action buttons
+    bindBtn('btn-touch-jump', () => {
+      this._jumpBuffer = JUMP_BUFFER;
+      this.keys.add('Space');
+    }, () => {
+      this.keys.delete('Space');
+    });
+
+    bindBtn('btn-touch-attack', () => {
+      this.attackHeld = true;
+      this._justPressed.add('Mouse0');
+    }, () => {
+      this.attackHeld = false;
+      this._justReleased.add('Mouse0');
+    });
+
+    bindBtn('btn-touch-place', () => {
+      this.useHeld = true;
+      this._justPressed.add('Mouse2');
+    }, () => {
+      this.useHeld = false;
+      this._justReleased.add('Mouse2');
+    });
+
+    // Top buttons
+    document.getElementById('btn-touch-inv')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.onInventoryToggle?.();
+    });
+    document.getElementById('btn-touch-fly')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.onFlyToggle?.();
+    });
+    document.getElementById('btn-touch-pause')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.onPauseRequested?.();
+    });
   }
 
   _releaseAll() {
@@ -121,17 +253,29 @@ export class Controls {
 
   requestLock() {
     this.wantLock = true;
+    if (this.isTouch) {
+      this.locked = true;
+      this.onLockChange?.(true);
+      return;
+    }
     this.canvas.requestPointerLock?.();
   }
 
   exitLock() {
     this.wantLock = false;
-    document.exitPointerLock?.();
+    if (!this.isTouch) {
+      document.exitPointerLock?.();
+    }
   }
 
   setUIOpen(open) {
     this.uiOpen = open;
-    if (open) { this.exitLock(); this._releaseAll(); }
+    if (open) {
+      this.exitLock();
+      this._releaseAll();
+    } else if (this.isTouch) {
+      this.locked = true;
+    }
   }
 
   // ============================================================
