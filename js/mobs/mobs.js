@@ -128,11 +128,14 @@ export class MobManager {
         continue;
       }
 
-      // ---- zombies burn in daylight ----
+      // ---- zombies burn in daylight only when exposed to open sky ----
       if (m instanceof Zombie && dayBurn) {
-        if (Math.random() < dt * 0.2) {
-          m.hurt(1, null);
-          if (m.dead) continue;
+        const above = this.world.getBlock(Math.floor(m.pos.x), Math.floor(m.pos.y + 2), Math.floor(m.pos.z));
+        if (above === B.AIR || above === B.WATER) {
+          if (Math.random() < dt * 0.25) {
+            m.hurt(1, null);
+            if (m.dead) continue;
+          }
         }
       }
 
