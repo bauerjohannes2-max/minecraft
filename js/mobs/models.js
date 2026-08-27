@@ -69,3 +69,100 @@ export function buildZombieModel() {
   }
   return { group: g, legs, arms };
 }
+
+export function buildSheepModel() {
+  const g = new THREE.Group();
+  const WOOL = 0xe8e8e8, SKIN = 0xd8c8b8;
+  g.add(box(0.7, 0.65, 1.1, WOOL, 0, 0.85, 0));
+  const head = box(0.4, 0.4, 0.45, SKIN, 0, 1.0, 0.72);
+  g.add(head);
+  const legs = [];
+  for (const [lx, lz] of [[-0.2,-0.35],[0.2,-0.35],[-0.2,0.35],[0.2,0.35]]) {
+    const leg = new THREE.Group();
+    leg.position.set(lx, 0.55, lz);
+    leg.add(box(0.15, 0.55, 0.15, SKIN, 0, -0.27, 0));
+    g.add(leg);
+    legs.push(leg);
+  }
+  return { group: g, legs };
+}
+
+export function buildCowModel() {
+  const g = new THREE.Group();
+  const HIDE = 0x4a3626, SPOT = 0xf0f0f0;
+  g.add(box(0.75, 0.7, 1.2, HIDE, 0, 0.95, 0));
+  g.add(box(0.3, 0.3, 0.02, SPOT, 0.18, 1.1, 0.61));
+  const head = box(0.45, 0.45, 0.5, HIDE, 0, 1.15, 0.78);
+  g.add(head);
+  g.add(box(0.08, 0.12, 0.08, 0xc0c0c0, -0.16, 1.42, 0.74));
+  g.add(box(0.08, 0.12, 0.08, 0xc0c0c0,  0.16, 1.42, 0.74));
+  const legs = [];
+  for (const [lx, lz] of [[-0.22,-0.4],[0.22,-0.4],[-0.22,0.4],[0.22,0.4]]) {
+    const leg = new THREE.Group();
+    leg.position.set(lx, 0.62, lz);
+    leg.add(box(0.17, 0.62, 0.17, HIDE, 0, -0.31, 0));
+    g.add(leg);
+    legs.push(leg);
+  }
+  return { group: g, legs };
+}
+
+export function buildPlayerAvatar(name) {
+  const g = new THREE.Group();
+  const SKIN = 0xd8a47a, SHIRT = 0x2288bb, PANTS = 0x2a386a, HAIR = 0x4a3222;
+
+  g.add(box(0.5, 0.65, 0.28, SHIRT, 0, 1.25, 0));   // Torso
+  g.add(box(0.42, 0.42, 0.42, SKIN, 0, 1.78, 0));  // Head
+  g.add(box(0.44, 0.14, 0.44, HAIR, 0, 1.95, 0));  // Hair
+
+  // Arms
+  const arms = [];
+  for (const s of [-1, 1]) {
+    const arm = new THREE.Group();
+    arm.position.set(s * 0.35, 1.5, 0);
+    arm.add(box(0.18, 0.65, 0.18, SHIRT, 0, -0.28, 0));
+    g.add(arm);
+    arms.push(arm);
+  }
+
+  // Legs
+  const legs = [];
+  for (const s of [-1, 1]) {
+    const leg = new THREE.Group();
+    leg.position.set(s * 0.13, 0.9, 0);
+    leg.add(box(0.2, 0.9, 0.22, PANTS, 0, -0.45, 0));
+    g.add(leg);
+    legs.push(leg);
+  }
+
+  // Floating nametag
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(0, 0, 256, 64);
+  ctx.font = 'bold 32px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(name, 128, 44);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.magFilter = THREE.NearestFilter;
+  texture.minFilter = THREE.NearestFilter;
+  const spriteMat = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+  const tag = new THREE.Sprite(spriteMat);
+  tag.scale.set(1.6, 0.4, 1);
+  tag.position.y = 2.25;
+  g.add(tag);
+
+  return {
+    group: g,
+    legs,
+    arms,
+    _walking: false,
+    setWalk(moving) {
+      this._walking = moving;
+    },
+  };
+}
