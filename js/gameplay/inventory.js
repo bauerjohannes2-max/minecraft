@@ -146,7 +146,13 @@ export class InventoryUI {
     for (let i = 0; i < 9; i++) {
       const d = document.createElement('div');
       d.className = 'slot';
-      d.addEventListener('mousedown', () => { this.inv.hotbarSel = i; this.renderAll(); });
+      d.addEventListener('mousedown', () => {
+        if (!this.inv.carried) {
+          this.inv.hotbarSel = i;
+          this.renderAll();
+        }
+      });
+      this._wireDrag(d, { type: 'inv', index: i - 9 });
       hb?.appendChild(d);
       this.hbEls.push(d);
     }
@@ -177,8 +183,10 @@ export class InventoryUI {
       }
     });
 
-    document.addEventListener('mousedown', () => {
-      if (this.inv.carried) setTimeout(() => this.inv.clearCarriedToInventory(), 0);
+    document.addEventListener('mousedown', (e) => {
+      if (!this.inv.carried) return;
+      if (e.target.closest('.slot')) return;
+      setTimeout(() => this.inv.clearCarriedToInventory(), 0);
     }, true);
 
     this.renderAll();
@@ -189,48 +197,56 @@ export class InventoryUI {
   }
 
   _wireDrag(el, ref) {
+    const getSlot = () => ref.get ? ref.get() : (ref.type === 'inv' ? this.inv.slots[ref.index + 9] : this.inv.slots[ref.index]);
+    const setSlot = (stack) => {
+      if (ref.set) {
+        ref.set(stack);
+      } else {
+        const idx = (ref.type === 'inv') ? ref.index + 9 : ref.index;
+        this.inv.slots[idx] = stack;
+      }
+    };
+
     el.addEventListener('mousedown', (e) => {
       e.stopPropagation();
       const inv = this.inv;
+      const src = getSlot();
 
-      const get = () => ref.get?.() ?? (ref.type === 'inv'
-        ? inv.slots[ref.index + 9]
-        : inv.slots[ref.index]);
-
-      const src = get();
       if (inv.carried) {
         if (!src) {
-          ref.set?.(inv.carried) ?? (inv.slots[(ref.type==='inv'? ref.index+9 : ref.index)] = inv.carried);
+          setSlot(inv.carried);
           inv.carried = null;
         } else if (src.thing === inv.carried.thing) {
           const max = inv.maxStack(src.thing);
           const take = Math.min(max - src.count, inv.carried.count);
-          src.count += take; inv.carried.count -= take;
+          src.count += take;
+          inv.carried.count -= take;
           if (inv.carried.count <= 0) inv.carried = null;
         } else {
           const tmp = { ...src };
-          ref.set?.(inv.carried) ?? (inv.slots[(ref.type==='inv'? ref.index+9 : ref.index)] = { ...inv.carried });
+          setSlot({ ...inv.carried });
           inv.carried = tmp;
         }
       } else if (src) {
         inv.carried = { ...src };
-        ref.set?.(null) ?? (inv.slots[(ref.type==='inv'? ref.index+9 : ref.index)] = null);
+        setSlot(null);
       }
       inv.onChanged?.();
     });
 
     el.addEventListener('contextmenu', (e) => {
-      e.preventDefault(); e.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
       const inv = this.inv;
-      const idx = (ref.type === 'inv') ? ref.index + 9 : ref.index;
-      const cur = ref.get?.() ?? inv.slots[idx];
+      const cur = getSlot();
 
       if (inv.carried) {
         if (!cur) {
-          ref.set?.({ thing: inv.carried.thing, count: 1 }) ?? (inv.slots[idx] = { thing: inv.carried.thing, count: 1 });
+          setSlot({ thing: inv.carried.thing, count: 1 });
           inv.carried.count--;
         } else if (cur.thing === inv.carried.thing && cur.count < inv.maxStack(cur.thing)) {
-          cur.count++; inv.carried.count--;
+          cur.count++;
+          inv.carried.count--;
         }
         if (inv.carried.count <= 0) inv.carried = null;
       } else if (cur && cur.count > 1) {
@@ -239,7 +255,7 @@ export class InventoryUI {
         cur.count -= half;
       } else if (cur) {
         inv.carried = { ...cur };
-        ref.set?.(null) ?? (inv.slots[idx] = null);
+        setSlot(null);
       }
       inv.onChanged?.();
     });

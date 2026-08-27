@@ -89,12 +89,13 @@ export class Mob {
     const mz = this.moveAxis('z', this.vel.z * dt);
     const blockedX = mx !== this.vel.x * dt;
     const blockedZ = mz !== this.vel.z * dt;
+    const wantX = this.vel.x, wantZ = this.vel.z;
     if (blockedX) this.vel.x = 0;
     if (blockedZ) this.vel.z = 0;
 
     this.jumpCooldown -= dt;
     if ((blockedX || blockedZ) && this.onGround && this.jumpCooldown <= 0 &&
-        (Math.abs(this.vel.x) > 0.1 || Math.abs(this.vel.z) > 0.1)) {
+        (Math.abs(wantX) > 0.1 || Math.abs(wantZ) > 0.1)) {
       this.vel.y = CONFIG.PLAYER_JUMP_VELOCITY * 0.9;
       this.jumpCooldown = 0.8;
     }
