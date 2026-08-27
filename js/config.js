@@ -121,7 +121,8 @@ export const BLOCK_DROPS = {
   [B.IRON_ORE]: B.IRON_ORE,
   [B.GOLD_ORE]: B.GOLD_ORE,
   [B.DIAMOND_ORE]: B.DIAMOND_ORE,
-  [B.TALLGRASS]: B.AIR,
+  [B.TALLGRASS]: () => Math.random() < 0.45 ? 116 /* wheat_seeds */ : B.AIR,
+  [B.LEAVES]: () => Math.random() < 0.15 ? 100 /* stick */ : B.AIR,
 };
 
 // ---------------- ITEM DEFINITIONS (non-block items) ----------------
@@ -141,6 +142,31 @@ export const ITEMS = {
   cooked_pork:  { id: 111, name: 'Cooked Porkchop',stack: 64, food: 8 },
   rotten_flesh: { id: 112, name: 'Rotten Flesh',   stack: 64, food: 2, poisonChance: 0.5 },
   coal:         { id: 113, name: 'Coal',           stack: 64 },
+
+  wood_hoe:     { id: 114, name: 'Wooden Hoe',     stack: 1, tool: 'hoe',     speed: 1.0 },
+  stone_hoe:    { id: 115, name: 'Stone Hoe',      stack: 1, tool: 'hoe',     speed: 1.0 },
+  wheat_seeds:  { id: 116, name: 'Wheat Seeds',    stack: 64 },
+  wheat:        { id: 117, name: 'Wheat',          stack: 64 },
+  bread:        { id: 118, name: 'Bread',          stack: 64, food: 5 },
+  raw_beef:     { id: 119, name: 'Raw Beef',       stack: 64, food: 3 },
+  steak:        { id: 120, name: 'Cooked Steak',   stack: 64, food: 8 },
+  wool:         { id: 121, name: 'Wool',           stack: 64 },
+  leather:      { id: 122, name: 'Leather',        stack: 64 },
+  gunpowder:    { id: 123, name: 'Gunpowder',      stack: 64 },
+
+  wood_sword:     { id: 130, name: 'Wooden Sword',    stack: 1, tool: 'sword', dmg: 4 },
+  stone_sword:    { id: 131, name: 'Stone Sword',     stack: 1, tool: 'sword', dmg: 5 },
+  iron_sword:     { id: 132, name: 'Iron Sword',      stack: 1, tool: 'sword', dmg: 7 },
+
+  leather_helmet: { id: 133, name: 'Leather Cap',     stack: 1, slot: 'head',  armor: 1 },
+  leather_tunic:  { id: 134, name: 'Leather Tunic',   stack: 1, slot: 'chest', armor: 2 },
+  iron_helmet:    { id: 135, name: 'Iron Helmet',     stack: 1, slot: 'head',  armor: 2 },
+  iron_chest:     { id: 136, name: 'Iron Chestplate', stack: 1, slot: 'chest', armor: 4 },
+
+  bow:            { id: 140, name: 'Bow',             stack: 1 },
+  arrow:          { id: 141, name: 'Arrow',           stack: 64 },
+  feather:        { id: 142, name: 'Feather',         stack: 64 },
+  stringy:        { id: 143, name: 'String',          stack: 64 },
 };
 // item helpers
 export const ITEM_IDS = Object.fromEntries(
@@ -148,77 +174,6 @@ export const ITEM_IDS = Object.fromEntries(
 );
 // "thing" helper: <100 = placeable block id, >=100 = ITEMS key
 export const thingIsBlock = n => n < 100;
-
-// ---------------- CRAFTING RECIPES ----------------
-// shape: array of rows; '.'=empty, letters map to ingredients below
-// Letters resolve against BOTH block names and item names.
-export const RECIPES = [
-  {
-    out: { thing: 'PLANKS', n: 4 },
-    shape: ['L'],
-    map: { L: 'wood_log' },
-  },
-  {
-    out: { thing: 100 /*stick*/, n: 4 },
-    shape: ['P', 'P'],
-    map: { P: 'planks' },
-  },
-  {
-    out: { thing: 101, n: 1 }, // wood pickaxe
-    shape: ['PPP', '.S.', '.S.'],
-    map: { P: 'planks', S: 'stick' },
-  },
-  {
-    out: { thing: 102, n: 1 },
-    shape: ['PP', 'PS', '.S'],
-    map: { P: 'planks', S: 'stick' },
-  },
-  {
-    out: { thing: 103, n: 1 },
-    shape: ['P', 'S', 'S'],
-    map: { P: 'planks', S: 'stick' },
-  },
-  {
-    out: { thing: 104, n: 1 },
-    shape: ['P', 'P', 'S'],
-    map: { P: 'planks', S: 'stick' },
-  },
-  {
-    out: { thing: 105, n: 1 },
-    shape: ['CCC', '.S.', '.S.'],
-    map: { C: 'cobble', S: 'stick' },
-  },
-  {
-    out: { thing: 106, n: 1 },
-    shape: ['CC', 'CS', '.S'],
-    map: { C: 'cobble', S: 'stick' },
-  },
-  {
-    out: { thing: 107, n: 1 },
-    shape: ['C', 'S', 'S'],
-    map: { C: 'cobble', S: 'stick' },
-  },
-  {
-    out: { thing: 108, n: 1 },
-    shape: ['C', 'C', 'S'],
-    map: { C: 'cobble', S: 'stick' },
-  },
-  {
-    out: { thing: 109, n: 1 },
-    shape: ['III', '.S.', '.S.'],
-    map: { I: 'iron_ore', S: 'stick' },
-  },
-  {
-    out: { thing: 110, n: 1 },
-    shape: ['I', 'I', 'S'],
-    map: { I: 'iron_ore', S: 'stick' },
-  },
-  {
-    out: { thing: 114, n: 4 }, // torches
-    shape: ['C', 'S'],
-    map: { C: 'coal_ore', S: 'stick' },
-  },
-];
 
 // Tool efficiency vs block tools — used in mining.js
 export const TOOL_MATCH_BONUS = {
@@ -239,10 +194,11 @@ export const BIOMES = {
 
 // ---------------- ENTITY TYPES ----------------
 export const MOB_TYPES = {
-  pig:      { w: 0.9, h: 0.9, hp: 10, passive: true,  speed: 1.6, drop: 112 /*porkchop*/, color: 0xEBA3A3 },
-  sheep:    { w: 0.9, h: 1.2, hp: 8,  passive: true,  speed: 1.5, drop: 113 /*wool*/,     color: 0xDDDDDD },
-  zombie:   { w: 0.6, h: 1.9, hp: 20, hostile: true,  speed: 2.4, damage: 3,              color: 0x55883B },
-  skeleton: { w: 0.6, h: 1.9, hp: 20, hostile: true,  speed: 2.2, damage: 2,              color: 0xC9C9C9 },
+  pig:      { w: 0.9, h: 0.9, hp: 10, passive: true,  speed: 1.6, drop: 110 /*raw_porkchop*/, color: 0xEBA3A3 },
+  sheep:    { w: 0.9, h: 1.2, hp: 8,  passive: true,  speed: 1.5, drop: 121 /*wool*/,         color: 0xDDDDDD },
+  cow:      { w: 0.9, h: 1.3, hp: 10, passive: true,  speed: 1.4, drop: 119 /*raw_beef*/,     color: 0x4A3626 },
+  zombie:   { w: 0.6, h: 1.9, hp: 20, hostile: true,  speed: 2.4, damage: 3, drop: 112 /*rotten_flesh*/, color: 0x55883B },
+  skeleton: { w: 0.6, h: 1.9, hp: 20, hostile: true,  speed: 2.2, damage: 2, drop: 141 /*arrow*/,        color: 0xC9C9C9 },
 };
 
 console.log('[config] registry loaded:', NUM_BLOCK_IDS, 'blocks,', Object.keys(ITEMS).length, 'items,', RECIPES.length, 'recipes');

@@ -25,13 +25,22 @@ function nameOf(idNum) {
 }
 
 const SMELT_RECIPES = [
-  { in: B.IRON_ORE,      out: 'iron_pickaxe' /* ingot or item */,  qty: 1 },
-  { in: B.SAND,          out: B.GLASS,       qty: 1 },
-  { in: B.COBBLE,        out: B.STONE,       qty: 1 },
-  { in: 112 /*pork*/,    out: 112,           qty: 1 },
+  { in: B.IRON_ORE,      out: 108 /* iron_ingot */,  qty: 1 },
+  { in: B.SAND,          out: B.GLASS,               qty: 1 },
+  { in: B.COBBLE,        out: B.STONE,               qty: 1 },
+  { in: 110 /*raw_pork*/,out: 111 /*cooked_pork*/,   qty: 1 },
+  { in: 119 /*raw_beef*/,out: 120 /*steak*/,         qty: 1 },
 ];
 
-const FUELS = { coal_ore: 80, wood_log: 15, planks: 7.5, stick: 2.5 };
+const FUELS = {
+  coal: 80,
+  coal_ore: 80,
+  113: 80,
+  wood_log: 15,
+  planks: 7.5,
+  stick: 2.5,
+  100: 2.5,
+};
 
 export class Containers {
   constructor(world) {

@@ -583,13 +583,17 @@ function updateDebug() {
   if (el.classList.contains('hidden')) return;
   const s = G.world.stats;
   const p = G.player;
-  const looking = G.fpsCam.getForward().multiplyScalar(5).add(
+  const fwd = G.fpsCam.getForward(new THREE.Vector3()).multiplyScalar(5);
+  const looking = fwd.add(
     new THREE.Vector3(Math.floor(p.pos.x), Math.floor(p.pos.y + 1.62), Math.floor(p.pos.z)));
   el.textContent =
-`VoxelCraft v1.1
+`VoxelCraft v1.5 — Multiplayer Grand Finale
 FPS      ${fps}
+Players  ${(G.net?.remotes?.size ?? 0) + 1} online (${G.net?.connected ? 'Connected' : 'Solo'})
 Time     ${(G.sky.time * 24).toFixed(1)}h (${G.sky.isNight() ? 'Night' : 'Day'})
 Air      ${G.swim ? G.swim.air.toFixed(1) : 10}s
+Armor    ${p.armorPoints ? p.armorPoints() : 0} pts
+Arrows   ${G.bow ? G.bow.arrows.length : 0}
 XYZ      ${p.pos.x.toFixed(2)} / ${p.pos.y.toFixed(2)} / ${p.pos.z.toFixed(2)}
 Chunk    ${Math.floor(p.pos.x/16)}, ${Math.floor(p.pos.z/16)}
 Chunks   ${s.chunks} loaded · ${s.pending} queued

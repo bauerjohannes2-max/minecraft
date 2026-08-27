@@ -12,43 +12,92 @@ import { B, ITEMS } from '../config.js';
 
 // resolve helper: name → numeric id (blocks first, then ITEMS)
 export function id(name) {
+  if (name === null || name === undefined) return null;
   if (typeof name === 'number') return name;
   if (B[name] !== undefined) return B[name];
   const upper = name.toUpperCase();
   if (B[upper] !== undefined) return B[upper];
 
   // alias mappings
-  if (name === 'coal') return B.COAL_ORE ?? 13;
-  if (name === 'wood_pick') return ITEMS.wood_pickaxe?.id ?? 101;
-  if (name === 'wood_axe') return ITEMS.wood_axe?.id ?? 102;
-  if (name === 'wood_shovel') return ITEMS.wood_shovel?.id ?? 103;
-  if (name === 'stone_pick') return ITEMS.stone_pickaxe?.id ?? 105;
-  if (name === 'stone_axe') return ITEMS.stone_axe?.id ?? 106;
+  if (name === 'coal') return ITEMS.coal?.id ?? 113;
+  if (name === 'coal_ore') return B.COAL_ORE ?? 13;
+  if (name === 'wood_log' || name === 'log') return B.WOOD_LOG;
+  if (name === 'planks') return B.PLANKS;
+  if (name === 'cobble') return B.COBBLE;
+  if (name === 'stone') return B.STONE;
+  if (name === 'sand') return B.SAND;
+  if (name === 'stick') return ITEMS.stick?.id ?? 100;
+  if (name === 'iron_ingot') return ITEMS.iron_ingot?.id ?? 108;
+  if (name === 'wood_pick') return ITEMS.wood_pick?.id ?? 101;
+  if (name === 'stone_pick') return ITEMS.stone_pick?.id ?? 102;
+  if (name === 'iron_pick') return ITEMS.iron_pick?.id ?? 103;
+  if (name === 'wood_axe') return ITEMS.wood_axe?.id ?? 104;
+  if (name === 'stone_axe') return ITEMS.stone_axe?.id ?? 105;
+  if (name === 'wood_shovel') return ITEMS.wood_shovel?.id ?? 106;
   if (name === 'stone_shovel') return ITEMS.stone_shovel?.id ?? 107;
-  if (name === 'iron_pick') return ITEMS.iron_pickaxe?.id ?? 109;
+  if (name === 'wood_hoe') return ITEMS.wood_hoe?.id ?? 114;
+  if (name === 'stone_hoe') return ITEMS.stone_hoe?.id ?? 115;
+  if (name === 'wheat') return ITEMS.wheat?.id ?? 117;
+  if (name === 'bread') return ITEMS.bread?.id ?? 118;
+  if (name === 'leather') return ITEMS.leather?.id ?? 122;
+  if (name === 'gunpowder') return ITEMS.gunpowder?.id ?? 123;
+  if (name === 'wood_sword') return ITEMS.wood_sword?.id ?? 130;
+  if (name === 'stone_sword') return ITEMS.stone_sword?.id ?? 131;
+  if (name === 'iron_sword') return ITEMS.iron_sword?.id ?? 132;
+  if (name === 'leather_helmet') return ITEMS.leather_helmet?.id ?? 133;
+  if (name === 'leather_tunic') return ITEMS.leather_tunic?.id ?? 134;
+  if (name === 'iron_helmet') return ITEMS.iron_helmet?.id ?? 135;
+  if (name === 'iron_chest') return ITEMS.iron_chest?.id ?? 136;
+  if (name === 'bow') return ITEMS.bow?.id ?? 140;
+  if (name === 'arrow') return ITEMS.arrow?.id ?? 141;
+  if (name === 'feather') return ITEMS.feather?.id ?? 142;
+  if (name === 'stringy' || name === 'string') return ITEMS.stringy?.id ?? 143;
+  if (name === 'torch') return B.TORCH;
+  if (name === 'tnt' || name === 'TNT') return B.TNT;
 
   return ITEMS[name]?.id ?? null;
 }
-
-const TIERS = [
-  ['wood',   B.PLANKS],
-  ['stone',  B.COBBLE ?? B.STONE],
-  ['iron',   B.IRON_ORE],
-];
 
 export const RECIPES = [
   // ---------- basics ----------
   { out: { n: 'planks', c: 4 },        shapeless: ['wood_log'] },
   { out: { n: 'stick',  c: 4 },        rows: ['P','P'],            map: { P: 'planks' } },
-  { out: { n: 'planks', c: 1 },        rows: ['PP','PP'],          map: { P: 'planks' } },
   { out: { n: 'torch',  c: 4 },        rows: ['C','S'],            map: { C: 'coal', S: 'stick' } },
+  { out: { n: 'torch',  c: 4 },        rows: ['C','S'],            map: { C: 'coal_ore', S: 'stick' } },
 
   // ---------- tools ----------
-  ...TIERS.flatMap(([tier, mat]) => mat == null ? [] : [
-    { out: { n: tier + '_pick', c: 1 },   rows: ['MMM',' S ',' S '], map: { M: mat, S: 'stick' }, needsTable: true },
-    { out: { n: tier + '_axe', c: 1 },    rows: ['MM','MS',' S'],    map: { M: mat, S: 'stick' }, needsTable: true },
-    { out: { n: tier + '_shovel', c: 1 }, rows: ['M','S','S'],       map: { M: mat, S: 'stick' }, needsTable: true },
-  ]),
+  // picks: 3 material top, stick column
+  { out: { n: 'wood_pick', c: 1 },     rows: ['MMM',' S ',' S '],  map: { M: 'planks', S: 'stick' }, needsTable: true },
+  { out: { n: 'stone_pick', c: 1 },    rows: ['MMM',' S ',' S '],  map: { M: 'cobble', S: 'stick' }, needsTable: true },
+  { out: { n: 'iron_pick', c: 1 },     rows: ['MMM',' S ',' S '],  map: { M: 'iron_ingot', S: 'stick' }, needsTable: true },
+
+  // axes: 2x2 blade + stick column
+  { out: { n: 'wood_axe', c: 1 },      rows: ['MM','MS',' S'],     map: { M: 'planks', S: 'stick' }, needsTable: true },
+  { out: { n: 'stone_axe', c: 1 },     rows: ['MM','MS',' S'],     map: { M: 'cobble', S: 'stick' }, needsTable: true },
+
+  // shovels: 1 material + stick column
+  { out: { n: 'wood_shovel', c: 1 },   rows: ['M','S','S'],        map: { M: 'planks', S: 'stick' }, needsTable: true },
+  { out: { n: 'stone_shovel', c: 1 },  rows: ['M','S','S'],        map: { M: 'cobble', S: 'stick' }, needsTable: true },
+
+  // hoes: 2 material top + stick column
+  { out: { n: 'wood_hoe', c: 1 },      rows: ['MM',' S',' S'],     map: { M: 'planks', S: 'stick' }, needsTable: true },
+  { out: { n: 'stone_hoe', c: 1 },     rows: ['MM',' S',' S'],     map: { M: 'cobble', S: 'stick' }, needsTable: true },
+
+  // swords: 2 material column + 1 stick
+  { out: { n: 'wood_sword', c: 1 },    rows: ['M','M','S'],        map: { M: 'planks', S: 'stick' }, needsTable: true },
+  { out: { n: 'stone_sword', c: 1 },   rows: ['M','M','S'],        map: { M: 'cobble', S: 'stick' }, needsTable: true },
+  { out: { n: 'iron_sword', c: 1 },    rows: ['M','M','S'],        map: { M: 'iron_ingot', S: 'stick' }, needsTable: true },
+
+  // weapons & armor & utility
+  { out: { n: 'bow', c: 1 },           rows: [' SI','S I',' SI'],  map: { S: 'stick', I: 'stringy' }, needsTable: true },
+  { out: { n: 'arrow', c: 4 },         rows: ['S','E'],            map: { S: 'stick', E: 'feather' } },
+  { out: { n: 'bread', c: 1 },         rows: ['WWW'],              map: { W: 'wheat' } },
+  { out: { n: 'tnt', c: 1 },           rows: ['GSG','SGS','GSG'],  map: { G: 'gunpowder', S: 'sand' }, needsTable: true },
+
+  { out: { n: 'leather_helmet', c: 1 }, rows: ['LLL','L L'],      map: { L: 'leather' }, needsTable: true },
+  { out: { n: 'leather_tunic', c: 1 },  rows: ['L L','LLL','LLL'], map: { L: 'leather' }, needsTable: true },
+  { out: { n: 'iron_helmet', c: 1 },    rows: ['III','I I'],       map: { I: 'iron_ingot' }, needsTable: true },
+  { out: { n: 'iron_chest', c: 1 },     rows: ['I I','III','III'], map: { I: 'iron_ingot' }, needsTable: true },
 ];
 
 function gridToIds(grid) {
