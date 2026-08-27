@@ -16,12 +16,12 @@ const CROSS_BLOCKS = new Set([B.TALLGRASS, B.FLOWER, B.TORCH].filter(x => x !== 
 // face definitions: dir, 4 corners (unit cube), and which tile slot
 // tileSlot: 0=top, 1=bottom, 2=side
 const FACES = [
-  { dir:[ 1, 0, 0], corners:[[1,1,0],[1,0,0],[1,1,1],[1,0,1]], shade:0.78, tileSlot:2 },
-  { dir:[-1, 0, 0], corners:[[0,1,1],[0,0,1],[0,1,0],[0,0,0]], shade:0.78, tileSlot:2 },
-  { dir:[ 0, 1, 0], corners:[[0,1,1],[1,1,1],[0,1,0],[1,1,0]], shade:1.00, tileSlot:0 },
-  { dir:[ 0,-1, 0], corners:[[1,0,1],[0,0,1],[1,0,0],[0,0,0]], shade:0.55, tileSlot:1 },
-  { dir:[ 0, 0, 1], corners:[[1,1,1],[1,0,1],[0,1,1],[0,0,1]], shade:0.68, tileSlot:2 },
-  { dir:[ 0, 0,-1], corners:[[0,1,0],[0,0,0],[1,1,0],[1,0,0]], shade:0.68, tileSlot:2 },
+  { dir:[ 1, 0, 0], corners:[[1,1,1],[1,0,1],[1,1,0],[1,0,0]], shade:0.78, tileSlot:2 },
+  { dir:[-1, 0, 0], corners:[[0,1,0],[0,0,0],[0,1,1],[0,0,1]], shade:0.78, tileSlot:2 },
+  { dir:[ 0, 1, 0], corners:[[0,1,0],[0,1,1],[1,1,0],[1,1,1]], shade:1.00, tileSlot:0 },
+  { dir:[ 0,-1, 0], corners:[[0,0,1],[0,0,0],[1,0,1],[1,0,0]], shade:0.55, tileSlot:1 },
+  { dir:[ 0, 0, 1], corners:[[0,1,1],[0,0,1],[1,1,1],[1,0,1]], shade:0.68, tileSlot:2 },
+  { dir:[ 0, 0,-1], corners:[[1,1,0],[1,0,0],[0,1,0],[0,0,0]], shade:0.68, tileSlot:2 },
 ];
 const QUAD_INDICES = [0,1,2, 2,1,3];
 

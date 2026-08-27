@@ -86,10 +86,16 @@ export class MobManager {
       if (y < 0 || y < CONFIG.SEA_LEVEL) continue;
 
       const night = this.isNight();
-      const roll = Math.random();
-      if (night ? roll < 0.65 : roll < 0.10) {
-        this.spawn('zombie', x + 0.5, y, z + 0.5);
+      if (night) {
+        if (Math.random() < 0.65) {
+          this.spawn('zombie', x + 0.5, y, z + 0.5);
+        } else {
+          const fauna = ['pig', 'sheep', 'cow'];
+          const chosen = fauna[Math.floor(Math.random() * fauna.length)];
+          this.spawn(chosen, x + 0.5, y, z + 0.5);
+        }
       } else {
+        // Daytime: only peaceful farm animals spawn on surface
         const fauna = ['pig', 'sheep', 'cow'];
         const chosen = fauna[Math.floor(Math.random() * fauna.length)];
         this.spawn(chosen, x + 0.5, y, z + 0.5);
