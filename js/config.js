@@ -201,4 +201,4 @@ export const MOB_TYPES = {
   skeleton: { w: 0.6, h: 1.9, hp: 20, hostile: true,  speed: 2.2, damage: 2, drop: 141 /*arrow*/,        color: 0xC9C9C9 },
 };
 
-console.log('[config] registry loaded:', NUM_BLOCK_IDS, 'blocks,', Object.keys(ITEMS).length, 'items,', RECIPES.length, 'recipes');
+console.log('[config] registry loaded:', NUM_BLOCK_IDS, 'blocks,', Object.keys(ITEMS).length, 'items');
