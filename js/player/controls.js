@@ -38,10 +38,12 @@ export class Controls {
     this.attackHeld = false;
     this.useHeld = false;
 
-    // -------- buffered jumps --------
+    // -------- buffered jumps & sprint --------
     this._jumpBuffer = 0;
     this._coyote = 0;
     this._quickSavePressed = false;
+    this._lastWPressTime = 0;
+    this._doubleTapSprint = false;
 
     // ---------------- keyboard ----------------
     document.addEventListener('keydown', (e) => {
@@ -50,6 +52,14 @@ export class Controls {
 
       if (this.uiOpen && !['Escape', 'KeyE'].includes(e.code)) return;
 
+      if (e.code === 'KeyW' || e.code === 'ArrowUp') {
+        const now = performance.now();
+        if (now - this._lastWPressTime < 300) {
+          this._doubleTapSprint = true;
+        }
+        this._lastWPressTime = now;
+      }
+
       this.keys.add(e.code);
       this._justPressed.add(e.code);
     });
@@ -57,6 +67,11 @@ export class Controls {
     document.addEventListener('keyup', (e) => {
       this.keys.delete(e.code);
       this._justReleased.add(e.code);
+      if (e.code === 'KeyW' || e.code === 'ArrowUp') {
+        if (!this.keys.has('KeyW') && !this.keys.has('ArrowUp')) {
+          this._doubleTapSprint = false;
+        }
+      }
     });
 
     window.addEventListener('blur', () => this._releaseAll());
@@ -193,10 +208,17 @@ export class Controls {
   wantsJump()    { return this._jumpBuffer > 0 && this.locked && !this.uiOpen; }
   consumeJump()  { this._jumpBuffer = 0; }
   isJumping()    { return this.locked && !this.uiOpen && this.keys.has('Space'); }
-  isSneaking()   { return this.locked && !this.uiOpen && this.keys.has('ShiftLeft'); }
-  isSprinting()  { return this.locked && !this.uiOpen &&
-                          (this.keys.has('ControlLeft') || this.keys.has('ShiftRight') || this.keys.has('KeyR')) &&
-                          (this.keys.has('KeyW') || this.keys.has('ArrowUp')); }
+  isSneaking()   { return this.locked && !this.uiOpen && (this.keys.has('ShiftLeft') || this.keys.has('KeyC')); }
+  isSprinting()  {
+    if (!this.locked || this.uiOpen) return false;
+    const movingFwd = this.keys.has('KeyW') || this.keys.has('ArrowUp');
+    if (!movingFwd) return false;
+    return this.keys.has('ControlLeft') ||
+           this.keys.has('ControlRight') ||
+           this.keys.has('ShiftRight') ||
+           this.keys.has('KeyR') ||
+           this._doubleTapSprint;
+  }
   get sneaking() { return this.isSneaking(); }
   get sprinting(){ return this.isSprinting(); }
   accel(isOnGround) { return isOnGround ? GROUND_ACCEL : AIR_ACCEL; }

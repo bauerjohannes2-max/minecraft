@@ -347,12 +347,15 @@ body.critical-hp #game-canvas { animation: critical-pulse 1s infinite alternate;
 
 .craft-wrap { margin-bottom: 10px; }
 .craft-label { font: bold 12px monospace; color: #ddd; margin-bottom: 4px; }
-.craft-row { display: flex; align-items: center; gap: 10px; }
-.craft-grid { display: grid; gap: 4px; }
-.craft-arrow { font-size: 20px; color: #aaa; }
-.craft-result-slot { border-color: var(--accent) !important; }
+.panel-section-title {
+  font: bold 12px monospace;
+  color: #bbb;
+  margin-bottom: 4px;
+  text-shadow: 1px 1px 0 #000;
+  letter-spacing: 0.5px;
+}
 
-#inventory-grid {
+#inventory-grid, #inventory-hotbar {
   display: grid;
   grid-template-columns: repeat(9, 46px);
   gap: 4px;

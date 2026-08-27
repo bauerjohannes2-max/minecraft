@@ -109,10 +109,18 @@ export class Player {
     const wish = controls.getMoveVector(this._wish);
 
     let speed;
+    const isSprinting = controls.isSprinting() && this.hunger > 6;
+    this.sprinting = isSprinting;
+
     if (this.flying)                 speed = CONFIG.PLAYER_SPRINT_SPEED * 1.8;
     else if (controls.isSneaking())  speed = CONFIG.PLAYER_SNEAK_SPEED;
-    else if (controls.isSprinting()) speed = CONFIG.PLAYER_SPRINT_SPEED;
-    else                             speed = CONFIG.PLAYER_WALK_SPEED;
+    else if (isSprinting) {
+      speed = CONFIG.PLAYER_SPRINT_SPEED;
+      if (Math.hypot(wish.x, wish.z) > 0.1) {
+        this.hunger = Math.max(0, this.hunger - dt * 0.08);
+      }
+    }
+    else speed = CONFIG.PLAYER_WALK_SPEED;
 
     // smooth acceleration toward wish vector
     const accel = controls.accel(this.onGround || this.flying);

@@ -152,9 +152,26 @@ export class InventoryUI {
           this.renderAll();
         }
       });
-      this._wireDrag(d, { type: 'inv', index: i - 9 });
+      this._wireDrag(d, { type: 'hotbar', index: i });
       hb?.appendChild(d);
       this.hbEls.push(d);
+    }
+
+    const panelHb = document.getElementById('inventory-hotbar');
+    if (panelHb) panelHb.innerHTML = '';
+    this.panelHbEls = [];
+    for (let i = 0; i < 9; i++) {
+      const d = document.createElement('div');
+      d.className = 'slot';
+      d.addEventListener('mousedown', () => {
+        if (!this.inv.carried) {
+          this.inv.hotbarSel = i;
+          this.renderAll();
+        }
+      });
+      this._wireDrag(d, { type: 'hotbar', index: i });
+      panelHb?.appendChild(d);
+      this.panelHbEls.push(d);
     }
 
     const ig = document.getElementById('inventory-grid');
@@ -197,7 +214,12 @@ export class InventoryUI {
   }
 
   _wireDrag(el, ref) {
-    const getSlot = () => ref.get ? ref.get() : (ref.type === 'inv' ? this.inv.slots[ref.index + 9] : this.inv.slots[ref.index]);
+    const getSlot = () => {
+      if (ref.get) return ref.get();
+      if (ref.type === 'inv') return this.inv.slots[ref.index + 9];
+      if (ref.type === 'hotbar') return this.inv.slots[ref.index];
+      return this.inv.slots[ref.index];
+    };
     const setSlot = (stack) => {
       if (ref.set) {
         ref.set(stack);
@@ -308,12 +330,18 @@ export class InventoryUI {
   }
 
   renderAll() {
-    for (let i = 0; i < 9; i++)
+    for (let i = 0; i < 9; i++) {
       this._fillSlotEl(this.hbEls[i], this.inv.slots[i], i === this.inv.hotbarSel);
+      if (this.panelHbEls && this.panelHbEls[i]) {
+        this._fillSlotEl(this.panelHbEls[i], this.inv.slots[i], i === this.inv.hotbarSel);
+      }
+    }
 
     for (let i = 0; i < 27; i++) {
       if (!this.panelOpen) continue;
-      this._fillSlotEl(this.invEls[i], this.inv.slots[i + 9]);
+      if (this.invEls && this.invEls[i]) {
+        this._fillSlotEl(this.invEls[i], this.inv.slots[i + 9]);
+      }
     }
 
     const c = this.inv.carried;

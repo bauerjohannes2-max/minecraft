@@ -405,10 +405,11 @@ G.combat = {
 };
 
 function toolDamage(heldThing) {
-  const held = G.inventory.labelOf(heldThing ?? -1);
-  if (held?.includes('_pick')) return held.startsWith('iron') ? 4 : held.startsWith('stone') ? 3 : 2;
-  if (held?.includes('_axe'))  return held.startsWith('iron') ? 5 : held.startsWith('stone') ? 4 : 3;
-  if (held?.includes('_sword')) return held.startsWith('iron') ? 6 : held.startsWith('stone') ? 5 : 4;
+  if (heldThing == null) return 1;
+  const def = Object.values(ITEMS).find(i => i.id === heldThing);
+  if (def?.dmg) return def.dmg;
+  if (def?.tool === 'axe') return def.id === 105 ? 4 : def.id === 104 ? 3 : 5;
+  if (def?.tool === 'pickaxe') return def.id === 103 ? 4 : def.id === 102 ? 3 : 2;
   return 1;
 }
 
@@ -570,6 +571,13 @@ function step(dt) {
 }
 
 function render() {
+  // dynamic sprint FOV zoom
+  const targetFov = G.player?.sprinting ? 84 : 75;
+  if (Math.abs(G.fpsCam.camera.fov - targetFov) > 0.1) {
+    G.fpsCam.camera.fov = THREE.MathUtils.lerp(G.fpsCam.camera.fov, targetFov, 0.15);
+    G.fpsCam.camera.updateProjectionMatrix();
+  }
+
   // camera shake
   G.fpsCam.camera.position.x += G_SHAKE.x;
   G.fpsCam.camera.position.y += G_SHAKE.y;
