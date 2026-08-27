@@ -5,13 +5,14 @@
    ============================================================ */
 
 import * as THREE from 'three';
-import { CONFIG, B } from '../config.js';
+import { CONFIG, B, ITEMS } from '../config.js';
 import { Mob } from './mob.js';
 import { Pig } from './pig.js';
+import { Sheep, Cow } from './passive.js';
 import { Zombie } from './zombie.js';
-import { buildPigModel, buildZombieModel } from './models.js';
+import { buildPigModel, buildZombieModel, buildSheepModel, buildCowModel } from './models.js';
 
-const MAX_MOBS = 14;
+const MAX_MOBS = 16;
 const DESPAWN_DIST = 60;
 
 export class MobManager {
@@ -27,22 +28,41 @@ export class MobManager {
 
   spawn(type, x, y, z) {
     if (this.mobs.length >= MAX_MOBS) return null;
-    const m = type === 'pig' ? new Pig(this.world) : new Zombie(this.world);
-    m.pos.set(x, y, z);
 
-    const model = type === 'pig' ? buildPigModel() : buildZombieModel();
+    let m, model;
+    if (type === 'pig') {
+      m = new Pig(this.world);
+      model = buildPigModel();
+      m.onDeath = () => this.loot(m, ITEMS.raw_porkchop?.id ?? 110, 1 + (Math.random() < 0.5 ? 1 : 0));
+    } else if (type === 'sheep') {
+      m = new Sheep(this.world);
+      model = buildSheepModel();
+      m.onDeath = () => {
+        this.loot(m, ITEMS.wool?.id ?? 121, 1 + Math.floor(Math.random() * 2));
+        if (Math.random() < 0.6) this.loot(m, ITEMS.raw_porkchop?.id ?? 110, 1);
+      };
+    } else if (type === 'cow') {
+      m = new Cow(this.world);
+      model = buildCowModel();
+      m.onDeath = () => {
+        this.loot(m, ITEMS.raw_beef?.id ?? 119, 1 + (Math.random() < 0.5 ? 1 : 0));
+        if (Math.random() < 0.7) this.loot(m, ITEMS.leather?.id ?? 122, 1);
+      };
+    } else {
+      m = new Zombie(this.world);
+      model = buildZombieModel();
+      m.onDeath = () => {
+        this.loot(m, ITEMS.rotten_flesh?.id ?? 112, 1);
+        if (Math.random() < 0.25) this.loot(m, ITEMS.gunpowder?.id ?? 123, 1);
+        if (Math.random() < 0.20) this.loot(m, ITEMS.stringy?.id ?? 143, 1);
+      };
+    }
+
+    m.pos.set(x, y, z);
     m.modelGroup = model.group;
     m.legs = model.legs;
     m.animPhase = Math.random() * 10;
     this.scene.add(model.group);
-
-    if (type === 'pig') {
-      m.onDeath = () => this.loot(m, 112 /* porkchop */, 1 + (Math.random() < 0.5 ? 1 : 0));
-    } else {
-      m.onDeath = () => {
-        if (Math.random() < 0.6) this.loot(m, 112, 1);
-      };
-    }
     this.mobs.push(m);
     return m;
   }
@@ -67,8 +87,13 @@ export class MobManager {
 
       const night = this.isNight();
       const roll = Math.random();
-      if (night ? roll < 0.6 : roll < 0.15)      this.spawn('zombie', x + 0.5, y, z + 0.5);
-      else                                       this.spawn('pig',    x + 0.5, y, z + 0.5);
+      if (night ? roll < 0.65 : roll < 0.10) {
+        this.spawn('zombie', x + 0.5, y, z + 0.5);
+      } else {
+        const fauna = ['pig', 'sheep', 'cow'];
+        const chosen = fauna[Math.floor(Math.random() * fauna.length)];
+        this.spawn(chosen, x + 0.5, y, z + 0.5);
+      }
       return;
     }
   }

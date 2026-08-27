@@ -78,7 +78,7 @@ function emitCross(t, x, y, z, buf, tileName) {
       buf.norm.push(0, 1, 0);
       buf.col.push(0.9, 0.9, 0.9);
     }
-    buf.uv.push(u0, v1,  u1, v1,  u1, v0,  u0, v0);
+    buf.uv.push(u0, v0,  u1, v0,  u1, v1,  u0, v1);
     buf.idx.push(base, base+1, base+2,  base, base+2, base+3);
     buf.v += 4;
   }
