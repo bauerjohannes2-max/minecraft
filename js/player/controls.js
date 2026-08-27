@@ -172,8 +172,8 @@ export class Controls {
     if (len > 0) { fx /= len; fz /= len; }
 
     const sin = Math.sin(this.yaw), cos = Math.cos(this.yaw);
-    out.x = fx * cos - fz * sin;
-    out.z = fx * sin + fz * cos;
+    out.x =  fx * cos + fz * sin;
+    out.z = -fx * sin + fz * cos;
     return out;
   }
 

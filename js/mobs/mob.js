@@ -106,7 +106,7 @@ export class Mob {
     if (len < 0.01) return;
     this.vel.x += (dx/len*speed - this.vel.x) * Math.min(1, 8 * 0.016);
     this.vel.z += (dz/len*speed - this.vel.z) * Math.min(1, 8 * 0.016);
-    this.yaw = Math.atan2(-dx, -dz);
+    this.yaw = Math.atan2(dx, dz);
   }
 
   hurt(dmg, knockFrom = null) {
