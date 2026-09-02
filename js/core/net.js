@@ -26,7 +26,7 @@ export class NetSystem {
     this._sendAcc = 0;
   }
 
-  connect(url = 'ws://localhost:9090', name = 'Steve') {
+  connect(url = `ws://${(typeof location !== 'undefined' && location.hostname) ? location.hostname : 'localhost'}:9090`, name = 'Steve') {
     this.name = name;
     try {
       this.ws = new WebSocket(url);

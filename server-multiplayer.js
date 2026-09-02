@@ -68,8 +68,20 @@ wss.on('connection', ws => {
     console.log(`[relay] Player #${id} disconnected (${wss.clients.size} online)`);
     broadcast({ t: 'leave', id });
   });
+
+  ws.on('error', (err) => {
+    console.warn(`[relay] Player #${id} socket error:`, err.message);
+  });
 });
 
-server.listen(9090, () => {
-  console.log('🎮 VoxelCraft relay active on ws://localhost:9090');
+server.on('error', (err) => {
+  console.error('[relay server error]', err);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('[relay uncaught]', err);
+});
+
+server.listen(9090, '0.0.0.0', () => {
+  console.log('🎮 VoxelCraft relay active on ws://0.0.0.0:9090');
 });
