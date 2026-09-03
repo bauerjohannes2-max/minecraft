@@ -85,3 +85,12 @@ process.on('uncaughtException', (err) => {
 server.listen(9090, '0.0.0.0', () => {
   console.log('🎮 VoxelCraft relay active on ws://0.0.0.0:9090');
 });
+
+// Keep-alive heartbeat
+setInterval(() => {
+  for (const ws of wss.clients) {
+    if (ws.readyState === 1) {
+      ws.ping();
+    }
+  }
+}, 30000);
